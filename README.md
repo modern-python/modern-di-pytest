@@ -37,8 +37,8 @@ def di_container() -> typing.Iterator[modern_di.Container]:
         yield container
 
 
-# Bulk: every Provider on Dependencies becomes a pytest fixture
-# named after the class attribute.
+# Bulk: every Provider on each group becomes a pytest fixture
+# named after the class attribute. Pass several groups in one call.
 expose(Dependencies)
 
 # Manual: turn a single type or Provider into a named fixture.
@@ -117,11 +117,12 @@ type (resolved via ``container.resolve``) or a Provider (resolved via
 ``container.resolve_provider``). The returned object is a real pytest fixture
 — assign it to a module-level name and pytest will collect it.
 
-### `expose(group, *, container_fixture="di_container", pytest_scope="function", module=None)`
+### `expose(*groups, container_fixture="di_container", pytest_scope="function", module=None)`
 
-Walk ``group`` (a ``Group`` subclass) and inject one pytest fixture per
+Walk each ``Group`` subclass in ``groups`` and inject one pytest fixture per
 Provider class attribute into the caller's module. Fixture names equal the
-class-attribute names. Non-Provider class attributes are skipped. Pass
-``module=`` explicitly when stack introspection cannot identify the caller.
+class-attribute names. Non-Provider class attributes are skipped. A duplicate
+attribute name across groups raises ``ValueError``. Pass ``module=``
+explicitly when stack introspection cannot identify the caller.
 
 ## 📚 [Documentation](https://modern-di.readthedocs.io)
