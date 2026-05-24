@@ -57,18 +57,19 @@ def modern_di_fixture(
 
 
 def expose(
-    group: type[Group],
-    *,
+    *groups: type[Group],
     container_fixture: str = "di_container",
     pytest_scope: _PytestScope = "function",
     module: types.ModuleType | None = None,
 ) -> None:
-    """Register one pytest fixture per Provider in ``group``.
+    """Register one pytest fixture per Provider across one or more groups.
 
     Each generated fixture is named after the class attribute it came from.
 
     Args:
-        group: A ``Group`` subclass whose class attributes are Providers.
+        *groups: One or more ``Group`` subclasses whose class attributes are
+            Providers. Attribute names must be unique across all groups; a
+            duplicate raises ``ValueError``.
         container_fixture: Name of the pytest fixture yielding the container.
         pytest_scope: pytest fixture scope applied to every generated fixture.
         module: Module to inject fixtures into. Defaults to the caller's module
@@ -77,14 +78,18 @@ def expose(
     Example (in ``conftest.py``)::
 
         from modern_di_pytest import expose
-        from app.ioc import Dependencies
+        from app.ioc import Auth, Billing, Dependencies
 
-        expose(Dependencies)
+        expose(Dependencies, Auth, Billing)
 
-    Every ``Dependencies.<attr>`` that is a Provider becomes a pytest fixture
-    named ``<attr>``. Non-Provider class attributes are skipped.
+    Every Provider class attribute on each group becomes a pytest fixture
+    named after that attribute. Non-Provider class attributes are skipped.
 
     """
+    if not groups:
+        msg = "expose() requires at least one Group."
+        raise TypeError(msg)
+
     if module is None:
         frame = inspect.stack()[1].frame
         module = inspect.getmodule(frame)
@@ -92,8 +97,19 @@ def expose(
         msg = "expose() could not determine the caller module; pass module=... explicitly."
         raise RuntimeError(msg)
 
-    for attr_name, attr_value in vars(group).items():
-        if isinstance(attr_value, AbstractProvider):
+    registered: dict[str, type[Group]] = {}
+    for group in groups:
+        for attr_name, attr_value in vars(group).items():
+            if not isinstance(attr_value, AbstractProvider):
+                continue
+            if attr_name in registered:
+                prior = registered[attr_name]
+                msg = (
+                    f"expose() cannot register {attr_name!r} from "
+                    f"{group.__name__}: already provided by {prior.__name__}."
+                )
+                raise ValueError(msg)
+            registered[attr_name] = group
             fixture = modern_di_fixture(
                 attr_value,
                 container_fixture=container_fixture,

@@ -3,12 +3,12 @@ import typing
 import modern_di
 import pytest
 
-from tests.sample import Dependencies
+from tests.sample import Dependencies, ExtraDependencies
 
 
 @pytest.fixture
 def di_container() -> typing.Iterator[modern_di.Container]:
-    with modern_di.Container(groups=[Dependencies]) as container:
+    with modern_di.Container(groups=[Dependencies, ExtraDependencies]) as container:
         yield container
 
 

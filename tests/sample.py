@@ -25,3 +25,7 @@ class Dependencies(Group):
 
     not_a_provider = "string literal, not a provider"
     _hidden_int = 7
+
+
+class ExtraDependencies(Group):
+    extra_repo = providers.Factory(scope=Scope.APP, creator=Repo, bound_type=None)
