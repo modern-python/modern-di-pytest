@@ -1,0 +1,77 @@
+[project]
+name = "modern-di-pytest"
+description = "Pytest integration for Modern-DI: turn DI dependencies into pytest fixtures"
+authors = [{ name = "Artur Shiriev", email = "me@shiriev.ru" }]
+requires-python = ">=3.10,<4"
+license = "MIT"
+readme = "README.md"
+keywords = ["DI", "dependency injector", "ioc-container", "pytest", "fixtures", "python"]
+classifiers = [
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = ["modern-di>=2,<3", "pytest>=7"]
+version = "0"
+
+[project.urls]
+repository = "https://github.com/modern-python/modern-di-pytest"
+docs = "https://modern-di.readthedocs.io"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+lint = [
+    "ty",
+    "ruff",
+    "eof-fixer",
+    "typing-extensions",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["modern_di_pytest"]
+
+[tool.ruff]
+fix = false
+unsafe-fixes = true
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D1",
+    "S101",
+    "TCH",
+    "FBT",
+    "D203",
+    "D213",
+    "COM812",
+    "ISC001",
+    "G004",
+]
+isort.lines-after-imports = 2
+isort.no-lines-before = ["standard-library", "local-folder"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=. --cov-report term-missing"
+
+[tool.coverage.report]
+exclude_also = [
+    "if typing.TYPE_CHECKING:",
+]
