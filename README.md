@@ -31,7 +31,7 @@ from app.ioc import Dependencies
 from app.services import EmailClient
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def di_container() -> typing.Iterator[modern_di.Container]:
     with modern_di.Container(groups=ioc.ALL_GROUPS) as container:
         yield container
@@ -72,7 +72,7 @@ from app.services import UserService
 
 
 @pytest.fixture
-def di_request_container(
+def request_container(
     di_container: modern_di.Container,
 ) -> typing.Iterator[modern_di.Container]:
     with di_container.build_child_container(scope=modern_di.Scope.REQUEST) as container:
@@ -80,7 +80,7 @@ def di_request_container(
 
 
 request_user_service = modern_di_fixture(
-    UserService, container_fixture="di_request_container"
+    UserService, container_fixture="request_container"
 )
 ```
 
