@@ -125,4 +125,10 @@ class-attribute names. Non-Provider class attributes are skipped. A duplicate
 attribute name across groups raises ``ValueError``. Pass ``module=``
 explicitly when stack introspection cannot identify the caller.
 
+## Part of `modern-python`
+
+Browse the full list of templates and libraries in
+[`modern-python`](https://github.com/modern-python) — see the org profile for the
+categorized index.
+
 ## 📚 [Documentation](https://modern-di.readthedocs.io)
