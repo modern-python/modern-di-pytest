@@ -11,14 +11,12 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 
-Pytest integration for [Modern-DI](https://github.com/modern-python/modern-di).
+Pytest integration for [Modern-DI](https://github.com/modern-python/modern-di) — turn any DI dependency into a pytest fixture with one line.
 
-Turn any DI dependency into a pytest fixture with one line.
-
-## Install
+## Installation
 
 ```bash
-uv add --dev modern-di-pytest
+uv add --dev modern-di-pytest      # or: pip install modern-di-pytest
 ```
 
 ## Usage
