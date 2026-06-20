@@ -1,12 +1,14 @@
 [project]
 name = "modern-di-pytest"
-description = "Pytest integration for Modern-DI: turn DI dependencies into pytest fixtures"
+description = "Pytest integration for modern-di — turn DI dependencies into fixtures"
 authors = [{ name = "Artur Shiriev", email = "me@shiriev.ru" }]
 requires-python = ">=3.10,<4"
 license = "MIT"
 readme = "README.md"
-keywords = ["DI", "dependency injector", "ioc-container", "pytest", "fixtures", "python"]
+keywords = ["dependency-injection", "di", "ioc-container", "modern-di", "pytest", "fixtures", "python"]
 classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
     "Framework :: Pytest",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -21,8 +23,11 @@ dependencies = ["modern-di>=2.16.1,<3", "pytest>=7"]
 version = "0"
 
 [project.urls]
-repository = "https://github.com/modern-python/modern-di-pytest"
-docs = "https://modern-di.modern-python.org"
+Homepage = "https://modern-di.modern-python.org"
+Documentation = "https://modern-di.modern-python.org"
+Repository = "https://github.com/modern-python/modern-di-pytest"
+Issues = "https://github.com/modern-python/modern-di-pytest/issues"
+Changelog = "https://github.com/modern-python/modern-di-pytest/releases"
 
 [dependency-groups]
 dev = [
