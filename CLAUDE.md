@@ -15,6 +15,14 @@ This project uses `just` and `uv`. See `Justfile` for the source of truth.
 - Run a single test: `just test tests/test_expose.py::test_expose_generates_repo_fixture` (or `-k <expr>`)
 - Type checker is `ty`; suppress with `# ty: ignore` (not `# type: ignore`)
 
+## Workflow
+
+Changes follow the planning convention in [`planning/README.md`](planning/README.md) —
+start at its **Quick path** to pick a lane (Full / Lightweight / Tiny) before
+making a change. `just check-planning` validates bundles; `just index` prints the
+change/decision index. The applied convention version is in
+`planning/.convention-version`.
+
 ## Architecture
 
 This package is a thin pytest adapter over [`modern-di`](https://github.com/modern-python/modern-di). All implementation lives in `modern_di_pytest/factory.py` and exposes exactly two public symbols:
@@ -25,3 +33,5 @@ This package is a thin pytest adapter over [`modern-di`](https://github.com/mode
 Key contract: this package does **not** own the container. The user defines a `di_container` pytest fixture (any scope) that yields a `modern_di.Container`. Child-scoped containers (e.g. `REQUEST`) are accessed by passing a different `container_fixture=` name — see `tests/conftest.py` for the `di_container` / `di_request_container` pattern. Overrides are not re-implemented here; users call `Container.override()` / `reset_override()` directly.
 
 `tests/sample.py` is the reference fixture model: a `Group` subclass holding `providers.Factory` instances at `APP` and `REQUEST` scopes, plus deliberately non-Provider attributes to exercise the skip path in `expose`.
+
+When a change alters a capability's behavior, update the matching `architecture/<capability>.md` in the same PR.
