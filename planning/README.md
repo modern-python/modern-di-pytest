@@ -121,5 +121,5 @@ artifact.
   does now (one file per capability).
 - [`_templates/`](_templates/) — copy the matching template when opening a bundle.
 - [`deferred.md`](deferred.md) — real-but-unscheduled items with revisit triggers.
-- Pre-convention design records live in [`docs/adr/`](../docs/adr/); new design
-  decisions follow this convention under [`decisions/`](decisions/).
+- [`decisions/`](decisions/) — design decisions taken (especially rejected
+  options), each with a revisit trigger; listed by `just index`.
