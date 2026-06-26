@@ -56,6 +56,38 @@ def modern_di_fixture(
     return _fixture
 
 
+def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing.Any]]:
+    """Decide which Providers to expose and under what names.
+
+    Pure: walks each group's attributes, keeps the ``AbstractProvider``s, skips
+    everything else, and returns a ``name -> provider`` mapping. Raises before
+    returning anything so callers never act on a partial result:
+
+    - ``TypeError`` if no groups are given.
+    - ``ValueError`` if a name is claimed by more than one group.
+    """
+    if not groups:
+        msg = "expose() requires at least one Group."
+        raise TypeError(msg)
+
+    providers: dict[str, AbstractProvider[typing.Any]] = {}
+    source: dict[str, type[Group]] = {}
+    for group in groups:
+        for attr_name, attr_value in vars(group).items():
+            if not isinstance(attr_value, AbstractProvider):
+                continue
+            if attr_name in source:
+                prior = source[attr_name]
+                msg = (
+                    f"expose() cannot register {attr_name!r} from "
+                    f"{group.__name__}: already provided by {prior.__name__}."
+                )
+                raise ValueError(msg)
+            source[attr_name] = group
+            providers[attr_name] = attr_value
+    return providers
+
+
 def expose(
     *groups: type[Group],
     container_fixture: str = "di_container",
@@ -86,9 +118,9 @@ def expose(
     named after that attribute. Non-Provider class attributes are skipped.
 
     """
-    if not groups:
-        msg = "expose() requires at least one Group."
-        raise TypeError(msg)
+    # Resolve the full set of fixtures (and surface any error) before touching
+    # the module, so a collision leaves the target untouched.
+    providers = _collect_fixtures(*groups)
 
     if module is None:
         frame = inspect.stack()[1].frame
@@ -97,23 +129,11 @@ def expose(
         msg = "expose() could not determine the caller module; pass module=... explicitly."
         raise RuntimeError(msg)
 
-    registered: dict[str, type[Group]] = {}
-    for group in groups:
-        for attr_name, attr_value in vars(group).items():
-            if not isinstance(attr_value, AbstractProvider):
-                continue
-            if attr_name in registered:
-                prior = registered[attr_name]
-                msg = (
-                    f"expose() cannot register {attr_name!r} from "
-                    f"{group.__name__}: already provided by {prior.__name__}."
-                )
-                raise ValueError(msg)
-            registered[attr_name] = group
-            fixture = modern_di_fixture(
-                attr_value,
-                container_fixture=container_fixture,
-                name=attr_name,
-                pytest_scope=pytest_scope,
-            )
-            setattr(module, attr_name, fixture)
+    for attr_name, provider in providers.items():
+        fixture = modern_di_fixture(
+            provider,
+            container_fixture=container_fixture,
+            name=attr_name,
+            pytest_scope=pytest_scope,
+        )
+        setattr(module, attr_name, fixture)
