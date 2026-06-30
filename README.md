@@ -8,7 +8,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/modern-di-pytest.svg)](https://pypi.org/project/modern-di-pytest/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/modern-di-pytest.svg)](https://pypi.org/project/modern-di-pytest/)
-[![Downloads](https://img.shields.io/pypi/dm/modern-di-pytest.svg)](https://pypistats.org/packages/modern-di-pytest)
+[![Downloads](https://static.pepy.tech/badge/modern-di-pytest/month)](https://pepy.tech/projects/modern-di-pytest)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/modern-python/modern-di-pytest/actions/workflows/ci.yml)
 [![CI](https://github.com/modern-python/modern-di-pytest/actions/workflows/ci.yml/badge.svg)](https://github.com/modern-python/modern-di-pytest/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/modern-python/modern-di-pytest.svg)](https://github.com/modern-python/modern-di-pytest/blob/main/LICENSE)
