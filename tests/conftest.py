@@ -8,7 +8,7 @@ from tests.sample import Dependencies, ExtraDependencies
 
 @pytest.fixture
 def di_container() -> typing.Iterator[modern_di.Container]:
-    with modern_di.Container(groups=[Dependencies, ExtraDependencies]) as container:
+    with modern_di.Container(groups=[Dependencies, ExtraDependencies], validate=True) as container:
         yield container
 
 
