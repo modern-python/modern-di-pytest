@@ -22,8 +22,8 @@ def modern_di_fixture(
     """Turn a modern-di dependency into a pytest fixture.
 
     Args:
-        dependency: A type (resolved via ``container.resolve``) or a Provider
-            (resolved via ``container.resolve_provider``).
+        dependency: A type or a Provider, resolved via
+            ``container.resolve_dependency``.
         container_fixture: Name of the pytest fixture that yields the container
             to resolve from. Defaults to ``"di_container"``. Use a child
             container fixture (e.g. ``"di_request_container"``) to resolve at a
@@ -49,9 +49,7 @@ def modern_di_fixture(
     @pytest.fixture(name=name, scope=pytest_scope)
     def _fixture(request: pytest.FixtureRequest) -> typing.Any:  # noqa: ANN401
         container = request.getfixturevalue(container_fixture)
-        if isinstance(dependency, AbstractProvider):
-            return container.resolve_provider(dependency)
-        return container.resolve(dependency)
+        return container.resolve_dependency(dependency)
 
     return _fixture
 
