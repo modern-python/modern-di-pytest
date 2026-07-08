@@ -19,7 +19,7 @@ This project uses `just` and `uv`. See `Justfile` for the source of truth.
 
 Changes follow the planning convention in [`planning/README.md`](planning/README.md) —
 start at its **Quick path** to pick a lane (Full / Lightweight / Tiny) before
-making a change. `just check-planning` validates bundles; `just index` prints the
+making a change. `just check-planning` validates planning changes; `just index` prints the
 change/decision index. The applied convention version is in
 `planning/.convention-version`.
 
