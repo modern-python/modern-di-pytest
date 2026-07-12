@@ -19,6 +19,8 @@
 
 Pytest integration for [Modern-DI](https://github.com/modern-python/modern-di) — turn any DI dependency into a pytest fixture with one line.
 
+Full guide: [pytest integration docs](https://modern-di.modern-python.org/integrations/pytest/)
+
 ## Installation
 
 ```bash
