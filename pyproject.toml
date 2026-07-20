@@ -19,7 +19,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Testing",
 ]
-dependencies = ["modern-di>=2.25,<3", "pytest>=7"]
+dependencies = ["modern-di>=3,<4", "pytest>=7"]
 version = "0"
 
 [project.urls]
