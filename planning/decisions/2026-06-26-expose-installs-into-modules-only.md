@@ -26,7 +26,7 @@ the `name -> provider` mapping in a `FixtureSet` object exposing
 `.install(into=...)`, turning the install target into a seam:
 
 ```python
-fixtures = collect_fixtures(Dependencies, Auth)   # a FixtureSet
+fixtures = collect_fixtures(Dependencies, Auth)  # a FixtureSet
 fixtures.install(into=module)
 ```
 
