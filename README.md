@@ -46,7 +46,8 @@ from app.services import EmailClient
 
 @pytest.fixture
 def di_container() -> typing.Iterator[modern_di.Container]:
-    with modern_di.Container(groups=ioc.ALL_GROUPS, validate=True) as container:
+    with modern_di.Container(groups=ioc.ALL_GROUPS) as container:
+        container.validate()  # 3.1: graph validation is an explicit call now
         yield container
 
 
