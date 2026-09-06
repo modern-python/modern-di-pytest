@@ -125,8 +125,8 @@ def test_with_override(
 ### `modern_di_fixture(dependency, *, container_fixture="di_container", name=None, pytest_scope="function")`
 
 Turn a single dependency into a pytest fixture. ``dependency`` is either a
-type (resolved via ``container.resolve``) or a Provider (resolved via
-``container.resolve_provider``). The returned object is a real pytest fixture
+type or a Provider; the generated fixture resolves it through
+``container.resolve_dependency``. The returned object is a real pytest fixture
 — assign it to a module-level name and pytest will collect it.
 
 ### `expose(*groups, container_fixture="di_container", pytest_scope="function", module=None)`
