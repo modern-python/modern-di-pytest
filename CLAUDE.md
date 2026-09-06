@@ -35,3 +35,11 @@ Key contract: this package does **not** own the container. The user defines a `d
 `tests/sample.py` is the reference fixture model: a `Group` subclass holding `providers.Factory` instances at `APP` and `REQUEST` scopes, plus deliberately non-Provider attributes to exercise the skip path in `expose`.
 
 When a change alters a capability's behavior, update the matching `architecture/<capability>.md` in the same PR.
+
+## Agent skills
+
+- **Issues and specs** — GitHub Issues on `modern-python/modern-di-pytest`, via `gh`:
+  [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md)
+- **Triage labels** — the five canonical roles: [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md)
+- **Domain docs** — single-context, `architecture/` + `planning/`:
+  [`docs/agents/domain.md`](docs/agents/domain.md)
