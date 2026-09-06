@@ -131,8 +131,8 @@ type or a Provider; the generated fixture resolves it through
 
 ### `expose(*groups, container_fixture="di_container", pytest_scope="function", module=None)`
 
-Walk each ``Group`` subclass in ``groups`` and inject one pytest fixture per
-Provider class attribute into the caller's module. Fixture names equal the
+Walk each ``Group`` subclass in ``groups`` and install one pytest fixture per
+Provider class attribute onto the caller's module. Fixture names equal the
 class-attribute names. Non-Provider class attributes are skipped. A duplicate
 attribute name across groups raises ``ValueError``, and calling it with no
 groups raises ``TypeError``. Pass ``module=`` explicitly when stack

@@ -75,7 +75,7 @@ def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing
             if attr_name in source:
                 prior = source[attr_name]
                 msg = (
-                    f"expose() cannot register {attr_name!r} from "
+                    f"expose() cannot install {attr_name!r} from "
                     f"{group.__name__}: already provided by {prior.__name__}."
                 )
                 raise ValueError(msg)
@@ -90,7 +90,7 @@ def expose(
     pytest_scope: _PytestScope = "function",
     module: types.ModuleType | None = None,
 ) -> None:
-    """Register one pytest fixture per Provider across one or more groups.
+    """Install one pytest fixture per Provider across one or more groups.
 
     Each generated fixture is named after the class attribute it came from.
 
@@ -100,7 +100,7 @@ def expose(
             duplicate raises ``ValueError``.
         container_fixture: Name of the pytest fixture yielding the container.
         pytest_scope: pytest fixture scope applied to every generated fixture.
-        module: Module to inject fixtures into. Defaults to the caller's module
+        module: Module to install fixtures onto. Defaults to the caller's module
             (located via ``inspect.stack()``).
 
     Example (in ``conftest.py``)::

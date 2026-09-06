@@ -2,44 +2,75 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Overview
+
+`modern-di-pytest` is a pytest adapter over
+[`modern-di`](https://github.com/modern-python/modern-di); [`CONTEXT.md`](CONTEXT.md) opens with
+what it does and owns the vocabulary — read it before naming a concept in code, a test name, or an
+issue title. It is one of that project's integrations, each of which lives in a separate repository
+and ships as a separate PyPI package.
+
 ## Commands
 
-This project uses `just` and `uv`. See `justfile` for the source of truth.
-
-- `just install` — `uv lock --upgrade` then `uv sync --all-extras --frozen --group lint`
-- `just lint` — runs `eof-fixer`, `ruff format`, `ruff check --fix`, then `ty check` (writes)
-- `just lint-ci` — same checks in non-mutating mode (`--check`, `--no-fix`)
-- `just test` — `uv run --no-sync pytest`, forwards extra args; no coverage (`addopts` is empty)
-- `just test-ci` — gated run: coverage with `--cov-fail-under=100` (the 100% line-coverage gate)
-- `just test-branch` — like `test-ci` plus `--cov-branch`
-- Run a single test: `just test tests/test_expose.py::test_expose_generates_repo_fixture` (or `-k <expr>`)
-- Type checker is `ty`; suppress with `# ty: ignore` (not `# type: ignore`)
-
-## Workflow
-
-Changes follow the planning convention in [`planning/README.md`](planning/README.md) —
-start at its **Quick path** to pick a lane (Full / Lightweight / Tiny) before
-making a change. `just check-planning` validates planning changes; `just index` prints the
-change/decision index. The applied convention version is in
-`planning/.convention-version`.
+`just` (task runner) and `uv` (package manager). The [`justfile`](justfile) is the source of truth —
+`just --list`, or read it. The one thing it does not say: a `ty` suppression is written
+`# ty: ignore`, never `# type: ignore`.
 
 ## Architecture
 
-This package is a thin pytest adapter over [`modern-di`](https://github.com/modern-python/modern-di). All implementation lives in `modern_di_pytest/factory.py` and exposes exactly two public symbols:
+All implementation is `modern_di_pytest/factory.py`, short enough to read whole. Read it.
 
-- `modern_di_fixture(dependency, *, container_fixture="di_container", name=None, pytest_scope="function")` — wraps a single type or `AbstractProvider` in a `@pytest.fixture`. At fixture time it calls `request.getfixturevalue(container_fixture)`, then delegates to `container.resolve_dependency(dependency)` — the type-or-provider dispatch lives in modern-di itself.
-- `expose(*groups, container_fixture="di_container", pytest_scope="function", module=None)` — variadic: accepts one or more `Group` subclasses. For each, iterates `vars(group)` and for every attribute that is an `AbstractProvider` instance, builds a `modern_di_fixture` and `setattr`s it onto the target module under the attribute's name. Non-Provider attributes (strings, ints, underscored, etc.) are silently skipped. A duplicate attribute name across the given groups raises `ValueError`; calling with no groups raises `TypeError`. When `module` is omitted, the caller's module is located via `inspect.stack()[1]` — `expose` therefore only works when called from module scope of a `conftest.py` / test module, not from inside a function.
+### Testing patterns
 
-Key contract: this package does **not** own the container. The user defines a `di_container` pytest fixture (any scope) that yields a `modern_di.Container`. Child-scoped containers (e.g. `REQUEST`) are accessed by passing a different `container_fixture=` name — see `tests/conftest.py` for the `di_container` / `di_request_container` pattern. Overrides are not re-implemented here; users call `Container.override()` / `reset_override()` directly.
+`tests/sample.py` is the fixture model every test builds on: a `Group` spanning two scopes, plus
+non-Provider attributes that exist to exercise the skip path.
 
-`tests/sample.py` is the reference fixture model: a `Group` subclass holding `providers.Factory` instances at `APP` and `REQUEST` scopes, plus deliberately non-Provider attributes to exercise the skip path in `expose`.
+## Workflow
 
-When a change alters a capability's behavior, update the matching `architecture/<capability>.md` in the same PR.
+**The spec for a change is its PR body**, not a committed file: why, design, non-goals,
+verification, reviewed with the diff. There is no change file and no lane to choose. A trivial PR
+(typo, dep bump, formatter, CI tweak) ships a conventional-commit title with no body ceremony.
+
+Two things outlive the PR, and there are exactly two places to put them: an alternative **rejected**
+with reasoning becomes an ADR in [`docs/adr/`](docs/adr/) (`NNNN-slug.md`, sequential, with a
+revisit trigger), and real work **not scheduled** becomes a GitHub issue. There is no third state,
+and no separate truth-home directory — a behaviour change is reviewed with the diff, not promoted
+to a page.
+
+### Where a fact goes
+
+Four homes, one owner each:
+
+| Home | Holds |
+|---|---|
+| `modern_di_pytest/` | anything readable from the module — the default |
+| a named test | an **invariant**: must stay true, and a change could silently break it |
+| `docs/adr/` | a rejected alternative, with the reasoning that would otherwise be re-litigated |
+| `README.md` | anything a user needs |
+
+Before writing a line anywhere:
+
+> Can an agent get this by reading `modern_di_pytest/`? → **don't write it.**
+> Would a wrong change here fail a test? → it belongs **in the test**, not in prose.
+> Does a user need it? → **`README.md`**.
+> Otherwise it does not get written.
+
+**Prose about mechanism has no home. There is no file to add a paragraph to.** This file included:
+it is always loaded, so a line that restates a docstring, a justfile comment, or `pyproject.toml`
+costs every turn and rots in two places at once. A package this small tempts a full restatement of
+its own source; that is the failure mode to watch for here.
+
+An invariant is a test whose name is the claim, with a docstring opening `INVARIANT:` and a second
+paragraph naming **what breaks it** — design rationale, not a report of what this one test catches.
+Nothing enforces that docstring shape; it is read at review time. A relative link to an ADR *is*
+checked — CI runs lychee `--offline` over every `.md` — but a path named in a docstring or a
+comment is not. Both ADRs and `INVARIANT:` docstrings ratchet: nothing prunes a record once its
+call is settled. Keeping them lean is a standing habit.
 
 ## Agent skills
 
 - **Issues and specs** — GitHub Issues on `modern-python/modern-di-pytest`, via `gh`:
   [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md)
 - **Triage labels** — the five canonical roles: [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md)
-- **Domain docs** — single-context, `architecture/` + `planning/`:
+- **Domain docs** — single-context, `CONTEXT.md` + `docs/adr/`:
   [`docs/agents/domain.md`](docs/agents/domain.md)
