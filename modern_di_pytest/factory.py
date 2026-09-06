@@ -57,9 +57,9 @@ def modern_di_fixture(
 def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing.Any]]:
     """Decide which Providers to expose and under what names.
 
-    Pure: walks each group's attributes, keeps the ``AbstractProvider``s, skips
-    everything else, and returns a ``name -> provider`` mapping. Raises before
-    returning anything so callers never act on a partial result:
+    Pure: asks each group for its named providers and returns a
+    ``name -> provider`` mapping. Raises before returning anything so callers
+    never act on a partial result:
 
     - ``TypeError`` if no groups are given.
     - ``ValueError`` if a name is claimed by more than one group.
@@ -71,9 +71,7 @@ def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing
     providers: dict[str, AbstractProvider[typing.Any]] = {}
     source: dict[str, type[Group]] = {}
     for group in groups:
-        for attr_name, attr_value in vars(group).items():
-            if not isinstance(attr_value, AbstractProvider):
-                continue
+        for attr_name, provider in group.get_named_providers().items():
             if attr_name in source:
                 prior = source[attr_name]
                 msg = (
@@ -82,7 +80,7 @@ def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing
                 )
                 raise ValueError(msg)
             source[attr_name] = group
-            providers[attr_name] = attr_value
+            providers[attr_name] = provider
     return providers
 
 

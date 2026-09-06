@@ -29,3 +29,7 @@ class Dependencies(Group):
 
 class ExtraDependencies(Group):
     extra_repo = providers.Factory(scope=Scope.APP, creator=Repo, bound_type=None)
+
+
+class InheritingDependencies(Dependencies):
+    own_repo = providers.Factory(scope=Scope.APP, creator=Repo, bound_type=None)
