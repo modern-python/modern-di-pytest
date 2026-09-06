@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
 
-This project uses `just` and `uv`. See `Justfile` for the source of truth.
+This project uses `just` and `uv`. See `justfile` for the source of truth.
 
 - `just install` — `uv lock --upgrade` then `uv sync --all-extras --frozen --group lint`
 - `just lint` — runs `eof-fixer`, `ruff format`, `ruff check --fix`, then `ty check` (writes)
