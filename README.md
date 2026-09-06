@@ -134,8 +134,9 @@ type or a Provider; the generated fixture resolves it through
 Walk each ``Group`` subclass in ``groups`` and inject one pytest fixture per
 Provider class attribute into the caller's module. Fixture names equal the
 class-attribute names. Non-Provider class attributes are skipped. A duplicate
-attribute name across groups raises ``ValueError``. Pass ``module=``
-explicitly when stack introspection cannot identify the caller.
+attribute name across groups raises ``ValueError``, and calling it with no
+groups raises ``TypeError``. Pass ``module=`` explicitly when stack
+introspection cannot identify the caller.
 
 ## 📦 [PyPI](https://pypi.org/project/modern-di-pytest)
 
