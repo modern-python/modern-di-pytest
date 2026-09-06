@@ -17,13 +17,13 @@ already has a home for each role. Use the repo's own files — do not create `CO
 | `docs/adr/` (durable decisions)    | `planning/decisions/<YYYY-MM-DD>-<slug>.md`     |
 | the *why* behind a shipped change  | `planning/changes/<YYYY-MM-DD>.NN-<slug>.md`    |
 
-`CLAUDE.md` carries the current public contract of `modern_di_pytest/factory.py` under its
+`AGENTS.md` carries the current public contract of `modern_di_pytest/factory.py` under its
 `## Architecture` heading. Read it before proposing anything about `modern_di_fixture` or
 `expose`; it is more specific than anything in `architecture/` today.
 
 ## Before exploring, read these
 
-- `CLAUDE.md` — `## Architecture` states the two public symbols and their contract.
+- `AGENTS.md` — `## Architecture` states the two public symbols and their contract.
 - `architecture/README.md`, then any `architecture/<capability>.md` touching your area.
   No capability files exist yet; the directory explains when to add the first.
 - `architecture/glossary.md` — the ubiquitous language.
