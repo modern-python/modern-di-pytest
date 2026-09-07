@@ -140,7 +140,7 @@ introspection cannot identify the caller.
 
 ## 📦 [PyPI](https://pypi.org/project/modern-di-pytest)
 
-## 📝 [License](LICENSE)
+## 📝 [License](https://github.com/modern-python/modern-di-pytest/blob/main/LICENSE)
 
 ## Part of `modern-python`
 
