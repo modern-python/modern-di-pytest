@@ -20,7 +20,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Testing",
 ]
-dependencies = ["modern-di>=3,<4", "pytest>=7"]
+dependencies = [
+    "modern-di>=3,<4",
+    # pytest's assertion rewriter used ast.Str, which 3.14 removed, until 7.4.
+    "pytest>=7; python_version < '3.14'",
+    "pytest>=7.4; python_version >= '3.14'",
+]
 version = "0"
 
 [project.urls]
@@ -31,9 +36,10 @@ Issues = "https://github.com/modern-python/modern-di-pytest/issues"
 Changelog = "https://github.com/modern-python/modern-di-pytest/releases"
 
 [dependency-groups]
+# pytest stays unbounded here so the floor above governs it, not a harness bound.
 dev = [
     "pytest",
-    "pytest-cov",
+    "pytest-cov>=5",
 ]
 lint = [
     "ty",
