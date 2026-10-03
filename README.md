@@ -17,7 +17,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 
-Pytest integration for [modern-di](https://github.com/modern-python/modern-di) — turn any DI dependency into a pytest fixture with one line.
+Pytest integration for [modern-di](https://github.com/modern-python/modern-di). It turns any DI dependency into a pytest fixture with one line.
 
 Full guide: [pytest integration docs](https://modern-di.modern-python.org/integrations/pytest/)
 
@@ -29,7 +29,7 @@ uv add --dev modern-di-pytest      # or: pip install modern-di-pytest
 
 ## Usage
 
-The user owns the root container fixture. Pick whatever pytest scope fits the test suite:
+You provide the root container fixture. Pick whatever pytest scope fits the test suite:
 
 ```python
 # conftest.py
@@ -47,7 +47,7 @@ from app.services import EmailClient
 @pytest.fixture
 def di_container() -> typing.Iterator[modern_di.Container]:
     with modern_di.Container(groups=ioc.ALL_GROUPS) as container:
-        container.validate()  # 3.1: graph validation is an explicit call now
+        container.validate()  # optional fail-fast; nothing validates the graph implicitly
         yield container
 
 
@@ -98,26 +98,29 @@ request_user_service = modern_di_fixture(UserService, container_fixture="request
 
 ## Overrides
 
-Use `Container.override()` directly — `modern-di` already ships a first-class
-override mechanism backed by a tree-shared `OverridesRegistry`:
+Use `Container.override()`; overrides are shared across the container tree.
+Generated fixtures resolve during test setup, so apply the override in a fixture
+they depend on. Overriding `di_container` in the test module does that:
 
 ```python
+import typing
+
 import modern_di
+import pytest
 
 from app.ioc import Dependencies
 from app.services import UserService
 from tests.fakes import FakeRepo
 
 
-def test_with_override(
-    di_container: modern_di.Container,
-    user_service: UserService,
-) -> None:
-    di_container.override(Dependencies.user_repo, FakeRepo())
-    try:
-        assert user_service.list_users() == []
-    finally:
-        di_container.reset_override(Dependencies.user_repo)
+@pytest.fixture
+def di_container(di_container: modern_di.Container) -> typing.Iterator[modern_di.Container]:
+    with di_container.override(Dependencies.user_repo, FakeRepo()):
+        yield di_container
+
+
+def test_with_override(user_service: UserService) -> None:
+    assert user_service.list_users() == []
 ```
 
 ## API
@@ -126,8 +129,8 @@ def test_with_override(
 
 Turn a single dependency into a pytest fixture. ``dependency`` is either a
 type or a Provider; the generated fixture resolves it through
-``container.resolve_dependency``. The returned object is a real pytest fixture
-— assign it to a module-level name and pytest will collect it.
+``container.resolve_dependency``. The returned object is a real pytest fixture;
+assign it to a module-level name and pytest will collect it.
 
 ### `expose(*groups, container_fixture="di_container", pytest_scope="function", module=None)`
 
@@ -144,7 +147,7 @@ introspection cannot identify the caller.
 
 ## Part of `modern-python`
 
-Built on [`modern-di`](https://github.com/modern-python/modern-di), a dependency-injection framework with IoC container and scopes.
+Built on [`modern-di`](https://github.com/modern-python/modern-di), a dependency-injection framework with an IoC container and scopes.
 
 Browse the full list of templates and libraries in
-[`modern-python`](https://github.com/modern-python) — see the org profile for the categorized index.
+[`modern-python`](https://github.com/modern-python); the org profile has the categorized index.
