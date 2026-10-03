@@ -1,6 +1,6 @@
 [project]
 name = "modern-di-pytest"
-description = "Pytest integration for modern-di — turn DI dependencies into fixtures"
+description = "Pytest integration for modern-di that turns DI dependencies into fixtures"
 authors = [{ name = "Artur Shiriev", email = "me@shiriev.ru" }]
 requires-python = ">=3.10,<4"
 license = "MIT"
