@@ -3,8 +3,8 @@ import types
 import typing
 
 import pytest
-from modern_di.group import Group
-from modern_di.providers.abstract import AbstractProvider
+from modern_di import Group
+from modern_di.providers import AbstractProvider
 
 
 T = typing.TypeVar("T")
