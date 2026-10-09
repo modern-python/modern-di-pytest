@@ -20,7 +20,7 @@ classifiers = [
     "Topic :: Software Development :: Testing",
 ]
 dependencies = [
-    "modern-di>=3,<5",
+    "modern-di>=4,<5",
     # pytest's assertion rewriter used ast.Str, which 3.14 removed, until 7.4.
     "pytest>=7; python_version < '3.14'",
     "pytest>=7.4; python_version >= '3.14'",
