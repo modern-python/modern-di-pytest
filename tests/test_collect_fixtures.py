@@ -57,3 +57,14 @@ def test_raises_on_duplicate_name_across_groups() -> None:
 def test_raises_when_called_with_no_groups() -> None:
     with pytest.raises(TypeError, match="at least one Group"):
         _collect_fixtures()
+
+
+def test_raises_on_name_already_defined_in_the_target_module() -> None:
+    with pytest.raises(ValueError, match=r"'service'.*Dependencies.*already defines"):
+        _collect_fixtures(Dependencies, existing_names={"service", "pytest"})
+
+
+def test_collects_when_existing_names_do_not_clash() -> None:
+    collected = _collect_fixtures(Dependencies, existing_names={"Repo", "pytest"})
+
+    assert set(collected) == {"repo", "service", "request_widget"}

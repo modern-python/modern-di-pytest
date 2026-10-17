@@ -73,6 +73,30 @@ def test_email(email_client: EmailClient) -> None:  # generated manually
     email_client.send("hi")
 ```
 
+## Fixture names and overrides
+
+`expose()` names each fixture after its provider attribute, so an exposed fixture
+follows pytest's usual override rules. It replaces any fixture with the same name
+from pytest itself, from plugins, or from a parent conftest, for every test under
+that conftest. A provider named `tmp_path` replaces pytest's `tmp_path`.
+
+`expose()` raises `ValueError` if the module it installs into already defines a
+name it would install, whether that name is a fixture or any other attribute. It
+cannot see fixtures defined elsewhere, so it does not report those.
+
+To avoid a clash, rename the provider or the existing attribute. To keep both
+names, do not pass that group to `expose()` and create its fixtures with
+`modern_di_fixture()`, giving the clashing one another name:
+
+```python
+app_settings = modern_di_fixture(Dependencies.settings)
+user_service = modern_di_fixture(Dependencies.user_service)
+```
+
+Call `expose()` after the conftest's own fixtures. A fixture defined after the
+call replaces the exposed fixture of the same name, and `expose()` cannot detect
+that.
+
 ## Pointing a fixture at a child container
 
 ```python
@@ -138,9 +162,9 @@ Walk each ``Group`` subclass in ``groups`` and install one pytest fixture per
 Provider class attribute onto the caller's module. Fixture names equal the
 class-attribute names. Non-Provider class attributes are skipped. A duplicate
 attribute name across groups raises ``ValueError``, as does a provider named
-the same as ``container_fixture``. Calling it with no groups raises
-``TypeError``. Pass ``module=`` explicitly when stack
-introspection cannot identify the caller.
+the same as ``container_fixture`` or a name the target module already defines.
+Calling it with no groups raises ``TypeError``. Pass ``module=`` explicitly when
+stack introspection cannot identify the caller.
 
 ## 📦 [PyPI](https://pypi.org/project/modern-di-pytest)
 

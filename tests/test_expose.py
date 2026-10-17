@@ -10,7 +10,7 @@ import types
 import pytest
 from modern_di import Group, Scope, providers
 
-from modern_di_pytest import expose
+from modern_di_pytest import expose, modern_di_fixture
 from tests.sample import Dependencies, ExtraDependencies, Repo, Service
 
 
@@ -100,3 +100,38 @@ def test_expose_allows_provider_named_like_the_default_when_container_fixture_di
     expose(Named, container_fixture="my_container", module=target)
 
     assert hasattr(target, "di_container")
+
+
+def test_expose_rejects_provider_named_like_a_fixture_in_the_module() -> None:
+    target = types.ModuleType("_target")
+    service = modern_di_fixture(Repo, name="service")
+    vars(target)["service"] = service
+
+    with pytest.raises(ValueError, match=r"'service'.*Dependencies.*already defines.*name="):
+        expose(Dependencies, module=target)
+
+    assert target.service is service
+    assert not hasattr(target, "repo")
+    assert not hasattr(target, "request_widget")
+
+
+def test_expose_rejects_provider_named_like_a_non_fixture_attribute() -> None:
+    target = types.ModuleType("_target")
+    vars(target)["repo"] = types
+
+    with pytest.raises(ValueError, match=r"'repo'.*Dependencies.*already defines"):
+        expose(Dependencies, ExtraDependencies, module=target)
+
+    assert target.repo is types
+    assert not hasattr(target, "service")
+    assert not hasattr(target, "extra_repo")
+
+
+def test_expose_installs_alongside_unrelated_module_attributes() -> None:
+    target = types.ModuleType("_target")
+    vars(target)["Repo"] = Repo
+
+    expose(Dependencies, module=target)
+
+    assert target.Repo is Repo
+    assert hasattr(target, "repo")
