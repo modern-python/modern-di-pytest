@@ -54,9 +54,16 @@ def modern_di_fixture(
     return _fixture
 
 
+def _require_groups(groups: tuple[type[Group], ...]) -> None:
+    if not groups:
+        msg = "expose() requires at least one Group."
+        raise TypeError(msg)
+
+
 def _collect_fixtures(
     *groups: type[Group],
     container_fixture: str = "di_container",
+    existing_names: typing.Collection[str] = (),
 ) -> dict[str, AbstractProvider[typing.Any]]:
     """Decide which Providers to expose and under what names.
 
@@ -67,10 +74,10 @@ def _collect_fixtures(
     - ``TypeError`` if no groups are given.
     - ``ValueError`` if a name is claimed by more than one group.
     - ``ValueError`` if a name equals ``container_fixture``.
+    - ``ValueError`` if a name is in ``existing_names``, the attributes the
+      target module already defines.
     """
-    if not groups:
-        msg = "expose() requires at least one Group."
-        raise TypeError(msg)
+    _require_groups(groups)
 
     providers: dict[str, AbstractProvider[typing.Any]] = {}
     source: dict[str, type[Group]] = {}
@@ -81,6 +88,14 @@ def _collect_fixtures(
                     f"expose() cannot install {attr_name!r} from {group.__name__}: "
                     f"it would replace the container fixture {container_fixture!r}. "
                     "Rename the provider or pass a different container_fixture."
+                )
+                raise ValueError(msg)
+            if attr_name in existing_names:
+                msg = (
+                    f"expose() cannot install {attr_name!r} from {group.__name__}: "
+                    "the target module already defines it. Rename the provider or the "
+                    "existing attribute, or create this group's fixtures with "
+                    "modern_di_fixture(..., name=...)."
                 )
                 raise ValueError(msg)
             if attr_name in source:
@@ -107,8 +122,9 @@ def expose(
 
     Args:
         *groups: One or more ``Group`` subclasses whose class attributes are
-            Providers. Attribute names must be unique across all groups; a
-            duplicate raises ``ValueError``.
+            Providers. Attribute names must be unique across all groups and
+            must not already be defined on the target module; either case
+            raises ``ValueError`` before anything is installed.
         container_fixture: Name of the pytest fixture yielding the container.
             A provider with this name raises ``ValueError``.
         pytest_scope: pytest fixture scope applied to every generated fixture.
@@ -126,16 +142,19 @@ def expose(
     named after that attribute. Non-Provider class attributes are skipped.
 
     """
-    # Resolve the full set of fixtures (and surface any error) before touching
-    # the module, so a collision leaves the target untouched.
-    providers = _collect_fixtures(*groups, container_fixture=container_fixture)
-
+    _require_groups(groups)
     if module is None:
         frame = inspect.stack()[1].frame
         module = inspect.getmodule(frame)
     if module is None:
         msg = "expose() could not determine the caller module; pass module=... explicitly."
         raise RuntimeError(msg)
+
+    providers = _collect_fixtures(
+        *groups,
+        container_fixture=container_fixture,
+        existing_names=vars(module).keys(),
+    )
 
     for attr_name, provider in providers.items():
         fixture = modern_di_fixture(
