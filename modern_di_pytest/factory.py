@@ -54,7 +54,10 @@ def modern_di_fixture(
     return _fixture
 
 
-def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing.Any]]:
+def _collect_fixtures(
+    *groups: type[Group],
+    container_fixture: str = "di_container",
+) -> dict[str, AbstractProvider[typing.Any]]:
     """Decide which Providers to expose and under what names.
 
     Pure: asks each group for its named providers and returns a
@@ -63,6 +66,7 @@ def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing
 
     - ``TypeError`` if no groups are given.
     - ``ValueError`` if a name is claimed by more than one group.
+    - ``ValueError`` if a name equals ``container_fixture``.
     """
     if not groups:
         msg = "expose() requires at least one Group."
@@ -72,6 +76,13 @@ def _collect_fixtures(*groups: type[Group]) -> dict[str, AbstractProvider[typing
     source: dict[str, type[Group]] = {}
     for group in groups:
         for attr_name, provider in group.get_named_providers().items():
+            if attr_name == container_fixture:
+                msg = (
+                    f"expose() cannot install {attr_name!r} from {group.__name__}: "
+                    f"it would replace the container fixture {container_fixture!r}. "
+                    "Rename the provider or pass a different container_fixture."
+                )
+                raise ValueError(msg)
             if attr_name in source:
                 prior = source[attr_name]
                 msg = (
@@ -99,6 +110,7 @@ def expose(
             Providers. Attribute names must be unique across all groups; a
             duplicate raises ``ValueError``.
         container_fixture: Name of the pytest fixture yielding the container.
+            A provider with this name raises ``ValueError``.
         pytest_scope: pytest fixture scope applied to every generated fixture.
         module: Module to install fixtures onto. Defaults to the caller's module
             (located via ``inspect.stack()``).
@@ -116,7 +128,7 @@ def expose(
     """
     # Resolve the full set of fixtures (and surface any error) before touching
     # the module, so a collision leaves the target untouched.
-    providers = _collect_fixtures(*groups)
+    providers = _collect_fixtures(*groups, container_fixture=container_fixture)
 
     if module is None:
         frame = inspect.stack()[1].frame

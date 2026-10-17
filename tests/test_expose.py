@@ -67,3 +67,36 @@ def test_expose_raises_when_module_cannot_be_determined() -> None:
     # RuntimeError branch in expose().
     with pytest.raises(RuntimeError, match="could not determine the caller module"):
         exec(compile(src, "<string>", "exec"), {})  # noqa: S102
+
+
+def test_expose_rejects_provider_named_like_the_container_fixture() -> None:
+    class Shadowing(Group):
+        di_container = providers.Factory(scope=Scope.APP, creator=Repo)
+
+    target = types.ModuleType("_target")
+    with pytest.raises(ValueError, match=r"Shadowing.*'di_container'.*container_fixture"):
+        expose(Dependencies, Shadowing, module=target)
+
+    assert not hasattr(target, "di_container")
+    assert not hasattr(target, "repo")
+
+
+def test_expose_rejects_provider_named_like_a_custom_container_fixture() -> None:
+    class Shadowing(Group):
+        my_container = providers.Factory(scope=Scope.APP, creator=Repo)
+
+    target = types.ModuleType("_target")
+    with pytest.raises(ValueError, match=r"Shadowing.*'my_container'.*container_fixture"):
+        expose(Shadowing, container_fixture="my_container", module=target)
+
+    assert not hasattr(target, "my_container")
+
+
+def test_expose_allows_provider_named_like_the_default_when_container_fixture_differs() -> None:
+    class Named(Group):
+        di_container = providers.Factory(scope=Scope.APP, creator=Repo)
+
+    target = types.ModuleType("_target")
+    expose(Named, container_fixture="my_container", module=target)
+
+    assert hasattr(target, "di_container")

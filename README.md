@@ -137,8 +137,9 @@ assign it to a module-level name and pytest will collect it.
 Walk each ``Group`` subclass in ``groups`` and install one pytest fixture per
 Provider class attribute onto the caller's module. Fixture names equal the
 class-attribute names. Non-Provider class attributes are skipped. A duplicate
-attribute name across groups raises ``ValueError``, and calling it with no
-groups raises ``TypeError``. Pass ``module=`` explicitly when stack
+attribute name across groups raises ``ValueError``, as does a provider named
+the same as ``container_fixture``. Calling it with no groups raises
+``TypeError``. Pass ``module=`` explicitly when stack
 introspection cannot identify the caller.
 
 ## 📦 [PyPI](https://pypi.org/project/modern-di-pytest)
