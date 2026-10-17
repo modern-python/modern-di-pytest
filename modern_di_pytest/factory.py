@@ -54,6 +54,12 @@ def modern_di_fixture(
     return _fixture
 
 
+def _require_groups(groups: tuple[type[Group], ...]) -> None:
+    if not groups:
+        msg = "expose() requires at least one Group."
+        raise TypeError(msg)
+
+
 def _collect_fixtures(
     *groups: type[Group],
     container_fixture: str = "di_container",
@@ -71,9 +77,7 @@ def _collect_fixtures(
     - ``ValueError`` if a name is in ``existing_names``, the attributes the
       target module already defines.
     """
-    if not groups:
-        msg = "expose() requires at least one Group."
-        raise TypeError(msg)
+    _require_groups(groups)
 
     providers: dict[str, AbstractProvider[typing.Any]] = {}
     source: dict[str, type[Group]] = {}
@@ -138,6 +142,7 @@ def expose(
     named after that attribute. Non-Provider class attributes are skipped.
 
     """
+    _require_groups(groups)
     if module is None:
         frame = inspect.stack()[1].frame
         module = inspect.getmodule(frame)

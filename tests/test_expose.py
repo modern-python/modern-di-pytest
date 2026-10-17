@@ -69,6 +69,12 @@ def test_expose_raises_when_module_cannot_be_determined() -> None:
         exec(compile(src, "<string>", "exec"), {})  # noqa: S102
 
 
+def test_expose_with_no_groups_raises_type_error_before_finding_the_module() -> None:
+    src = "from modern_di_pytest import expose\nexpose()\n"
+    with pytest.raises(TypeError, match="at least one Group"):
+        exec(compile(src, "<string>", "exec"), {})  # noqa: S102
+
+
 def test_expose_rejects_provider_named_like_the_container_fixture() -> None:
     class Shadowing(Group):
         di_container = providers.Factory(scope=Scope.APP, creator=Repo)
