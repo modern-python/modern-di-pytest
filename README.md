@@ -166,9 +166,10 @@ the same as ``container_fixture`` or a name the target module already defines.
 Calling it with no groups raises ``TypeError``. Pass ``module=`` explicitly when
 stack introspection cannot identify the caller.
 
-## 📦 [PyPI](https://pypi.org/project/modern-di-pytest)
+## Links
 
-## 📝 [License](https://github.com/modern-python/modern-di-pytest/blob/main/LICENSE)
+- [PyPI](https://pypi.org/project/modern-di-pytest)
+- [License](https://github.com/modern-python/modern-di-pytest/blob/main/LICENSE)
 
 ## Part of `modern-python`
 
