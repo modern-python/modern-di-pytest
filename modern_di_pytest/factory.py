@@ -1,4 +1,5 @@
 import inspect
+import sys
 import types
 import typing
 
@@ -129,7 +130,7 @@ def expose(
             A provider with this name raises ``ValueError``.
         pytest_scope: pytest fixture scope applied to every generated fixture.
         module: Module to install fixtures onto. Defaults to the caller's module
-            (located via ``inspect.stack()``).
+            (located via the calling frame).
 
     Example (in ``conftest.py``)::
 
@@ -144,8 +145,7 @@ def expose(
     """
     _require_groups(groups)
     if module is None:
-        frame = inspect.stack()[1].frame
-        module = inspect.getmodule(frame)
+        module = inspect.getmodule(sys._getframe(1))  # noqa: SLF001
     if module is None:
         msg = "expose() could not determine the caller module; pass module=... explicitly."
         raise RuntimeError(msg)
